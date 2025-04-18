@@ -12,6 +12,9 @@ import EditCategoryScreen from "../screens/Categories/EditCategoryScreen";
 import BrandListScreen from "../screens/BrandManagement/BrandListScreen";
 import AddBrandScreen from "../screens/BrandManagement/AddBrandScreen";
 import EditBrandScreen from "../screens/BrandManagement/EditBrandScreen";
+import OrderListScreen from "../screens/Orders/OrderListScreen";
+import OrderDetailScreen from "../screens/Orders/OrderDetailScreen";
+
 
 const Stack = createStackNavigator();
 
@@ -49,6 +52,10 @@ export default function AppNavigator() {
       <Stack.Screen name="BrandListScreen" component={BrandListScreen} />
       <Stack.Screen name="AddBrandScreen" component={AddBrandScreen} />
       <Stack.Screen name="EditBrandScreen" component={EditBrandScreen} />
+
+      {/* Quản lý đơn hàng */}
+      <Stack.Screen name="OrderListScreen" component={OrderListScreen} />
+      <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
     </Stack.Navigator>
   );
 }
