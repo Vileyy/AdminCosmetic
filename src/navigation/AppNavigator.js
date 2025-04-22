@@ -15,6 +15,9 @@ import EditBrandScreen from "../screens/BrandManagement/EditBrandScreen";
 import OrderListScreen from "../screens/Orders/OrderListScreen";
 import OrderDetailScreen from "../screens/Orders/OrderDetailScreen";
 import RevenueScreen from "../screens/Revenue/RevenueScreen";
+import BannerListScreen from "../screens/Banner/BannerListScreen";
+import AddBannerScreen from "../screens/Banner/AddBannerScreen";
+import EditBannerScreen from "../screens/Banner/EditBannerScreen";
 
 const Stack = createStackNavigator();
 
@@ -59,6 +62,12 @@ export default function AppNavigator() {
 
       {/* Quản lý doanh thu */}
       <Stack.Screen name="RevenueScreen" component={RevenueScreen} />
+
+      {/* Quản lý Banner */}
+      <Stack.Screen name="BannerListScreen" component={BannerListScreen} />
+      <Stack.Screen name="AddBannerScreen" component={AddBannerScreen} />
+      <Stack.Screen name="EditBannerScreen" component={EditBannerScreen} />
+
     </Stack.Navigator>
   );
 }
