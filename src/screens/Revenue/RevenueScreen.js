@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
-  
 } from "react-native";
 import {
   getRevenueStats,
@@ -103,10 +102,10 @@ const RevenueScreen = () => {
     });
   };
   const truncateWords = (str, numWords) => {
-    if (!str) return '';
-    const words = str.trim().split(' ');
+    if (!str) return "";
+    const words = str.trim().split(" ");
     if (words.length <= numWords) return str;
-    return words.slice(0, numWords).join(' ') + '...';
+    return words.slice(0, numWords).join(" ") + "...";
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -244,32 +243,65 @@ const RevenueScreen = () => {
         <BarChart
           data={{
             labels: topProducts.map((product) =>
-              product.name.length > 10
-                ? product.name.substring(0, 10) + "..."
+              product.name.length > 8
+                ? product.name.substring(0, 8) + "..."
                 : product.name
             ),
             datasets: [
               {
                 data: topProducts.map((product) => product.quantity),
-                color: (opacity = 1) => `rgba(51, 102, 255, ${opacity})`,
+                colors: [
+                  (opacity = 1) => `rgba(255, 99, 132, ${opacity})`, // Đỏ
+                  (opacity = 1) => `rgba(54, 162, 235, ${opacity})`, // Xanh dương
+                  (opacity = 1) => `rgba(255, 159, 64, ${opacity})`, // Cam
+                  (opacity = 1) => `rgba(75, 192, 192, ${opacity})`, // Xanh lá
+                  (opacity = 1) => `rgba(153, 102, 255, ${opacity})`, // Tím
+                ],
               },
             ],
           }}
           width={screenWidth - 40}
-          height={220}
+          height={280}
           yAxisSuffix=""
           chartConfig={{
             backgroundGradientFrom: "#FFFFFF",
-            backgroundGradientTo: "#F0F4F8",
+            backgroundGradientTo: "#FFFFFF",
             decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(51, 102, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(74, 101, 114, ${opacity})`,
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             style: {
               borderRadius: 16,
             },
-            barPercentage: 0.7,
+            barPercentage: 0.6,
+            fillShadowGradient: "#FFFFFF",
+            fillShadowGradientOpacity: 0.1,
+            propsForBackgroundLines: {
+              strokeWidth: 1,
+              stroke: "#E5E9EC",
+              strokeDasharray: "0",
+            },
+            propsForLabels: {
+              fontSize: 11,
+              fontWeight: "600",
+            },
+            propsForDots: {
+              r: "6",
+              strokeWidth: "2",
+              stroke: "#FFFFFF",
+            },
           }}
           style={styles.chart}
+          showBarTops={true}
+          withInnerLines={true}
+          withOuterLines={true}
+          withHorizontalLabels={true}
+          withVerticalLabels={true}
+          withDots={false}
+          withShadow={true}
+          withCustomBarColorFromData={true}
+          flatColor={false}
+          segments={4}
+          fromZero={true}
         />
       </View>
 

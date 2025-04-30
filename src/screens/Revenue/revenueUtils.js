@@ -61,30 +61,48 @@ export const getRevenueStats = async (callback) => {
 };
 
 // === 2. Doanh thu theo khoảng thời gian (chart) với hỗ trợ nhiều loại thời gian ===
-export const getRevenueByPeriod = async (startDate, endDate, callback, periodType = 'day') => {
+export const getRevenueByPeriod = async (
+  startDate,
+  endDate,
+  callback,
+  periodType = "day"
+) => {
   const db = getDatabase();
   const usersRef = ref(db, "users");
 
   // Xác định cách nhóm dữ liệu dựa trên loại thời gian
   const getGroupKey = (date) => {
-    if (periodType === 'day') {
-      return date.toISOString().split('T')[0]; // YYYY-MM-DD
-    } else if (periodType === 'month') {
+    if (periodType === "day") {
+      return date.toISOString().split("T")[0]; // YYYY-MM-DD
+    } else if (periodType === "month") {
       return `${date.getFullYear()}-${date.getMonth() + 1}`; // YYYY-MM
-    } else if (periodType === 'year') {
+    } else if (periodType === "year") {
       return `${date.getFullYear()}`; // YYYY
     }
   };
 
   const getDisplayLabel = (key) => {
-    if (periodType === 'day') {
+    if (periodType === "day") {
       const date = new Date(key);
       return `${date.getDate()}/${date.getMonth() + 1}`;
-    } else if (periodType === 'month') {
-      const [year, month] = key.split('-');
-      const monthNames = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
+    } else if (periodType === "month") {
+      const [year, month] = key.split("-");
+      const monthNames = [
+        "Th1",
+        "Th2",
+        "Th3",
+        "Th4",
+        "Th5",
+        "Th6",
+        "Th7",
+        "Th8",
+        "Th9",
+        "Th10",
+        "Th11",
+        "Th12",
+      ];
       return `${monthNames[parseInt(month) - 1]}`;
-    } else if (periodType === 'year') {
+    } else if (periodType === "year") {
       return key;
     }
   };
@@ -94,7 +112,7 @@ export const getRevenueByPeriod = async (startDate, endDate, callback, periodTyp
   const dateArray = [];
 
   // Tạo các nhóm dữ liệu dựa trên loại thời gian và khoảng thời gian
-  if (periodType === 'day') {
+  if (periodType === "day") {
     let currentDate = new Date(startDate);
     while (currentDate <= endDate) {
       const dateKey = getGroupKey(currentDate);
@@ -102,16 +120,24 @@ export const getRevenueByPeriod = async (startDate, endDate, callback, periodTyp
       revenueMap.set(dateKey, 0);
       currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
     }
-  } else if (periodType === 'month') {
-    let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  } else if (periodType === "month") {
+    let currentDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      1
+    );
     while (currentDate <= endDate) {
       const dateKey = getGroupKey(currentDate);
       dateArray.push(dateKey);
       revenueMap.set(dateKey, 0);
       currentDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
     }
-  } else if (periodType === 'year') {
-    for (let year = startDate.getFullYear(); year <= endDate.getFullYear(); year++) {
+  } else if (periodType === "year") {
+    for (
+      let year = startDate.getFullYear();
+      year <= endDate.getFullYear();
+      year++
+    ) {
       const dateKey = String(year);
       dateArray.push(dateKey);
       revenueMap.set(dateKey, 0);
@@ -147,7 +173,7 @@ export const getRevenueByPeriod = async (startDate, endDate, callback, periodTyp
       // Giới hạn số điểm dữ liệu cho dễ đọc
       let targetDates = dateArray;
       let maxDataPoints = 12; // Số điểm dữ liệu tối đa hiển thị
-      
+
       if (dateArray.length > maxDataPoints) {
         const step = Math.ceil(dateArray.length / maxDataPoints);
         targetDates = dateArray.filter((_, i) => i % step === 0);
@@ -190,12 +216,21 @@ export const getTopProducts = async (limit = 5, callback) => {
                   const price = item.price;
 
                   if (!productSalesMap.has(productId)) {
-                    const productData = productsData && productsData[productId] ? productsData[productId] : null;
-                    
+                    const productData =
+                      productsData && productsData[productId]
+                        ? productsData[productId]
+                        : null;
+
                     productSalesMap.set(productId, {
                       id: productId,
-                      name: productData ? productData.name : item.name || `Sản phẩm #${productId}`,
-                      imageUrl: productData ? productData.imageUrl : null,
+                      name: productData
+                        ? productData.name
+                        : item.name || `Sản phẩm #${productId}`,
+                      image: productData
+                        ? productData.image ||
+                          productData.imageUrl ||
+                          productData.images?.[0]
+                        : null,
                       quantity: 0,
                       revenue: 0,
                     });
@@ -268,10 +303,7 @@ export const getRevenueByCategory = async (callback) => {
                     const productId = item.productId || item.id;
                     const categoryId = productCategoryMap.get(productId);
 
-                    if (
-                      categoryId &&
-                      categoryRevenueMap.has(categoryId)
-                    ) {
+                    if (categoryId && categoryRevenueMap.has(categoryId)) {
                       const cat = categoryRevenueMap.get(categoryId);
                       cat.revenue += item.price * item.quantity;
                     }
