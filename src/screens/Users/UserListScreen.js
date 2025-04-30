@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { Ionicons } from "@expo/vector-icons";
@@ -42,26 +43,38 @@ export default function UserListScreen({ navigation }) {
       }
     >
       <View style={styles.avatarContainer}>
-        {item.avatar ? (
-          <Image source={{ uri: item.avatar }} style={styles.avatar} />
+        {item.photoURL && item.photoURL !== "" ? (
+          <Image
+            source={{ uri: item.photoURL }}
+            style={styles.avatar}
+            onError={(e) =>
+              console.log("Avatar load error:", e.nativeEvent.error)
+            }
+          />
         ) : (
           <View style={styles.defaultAvatar}>
             <Text style={styles.defaultAvatarText}>
-              {item.name ? item.name.charAt(0).toUpperCase() : "U"}
+              {item.displayName
+                ? item.displayName.charAt(0).toUpperCase()
+                : "U"}
             </Text>
           </View>
         )}
-        <View style={[
-          styles.statusIndicator, 
-          { backgroundColor: item.status === "active" ? "#4CAF50" : "#F44336" }
-        ]} />
+        <View
+          style={[
+            styles.statusIndicator,
+            {
+              backgroundColor: item.status === "active" ? "#4CAF50" : "#F44336",
+            },
+          ]}
+        />
       </View>
-      
+
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
-          {item.name || "Chưa cập nhật"}
+          {item.displayName || "Chưa cập nhật"}
         </Text>
-        
+
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
             <Ionicons name="mail-outline" size={14} color="#666" />
@@ -69,14 +82,14 @@ export default function UserListScreen({ navigation }) {
               {item.email || "Chưa cập nhật"}
             </Text>
           </View>
-          
+
           <View style={styles.detailRow}>
             <Ionicons name="call-outline" size={14} color="#666" />
             <Text style={styles.detailText} numberOfLines={1}>
               {item.phone || "Chưa cập nhật"}
             </Text>
           </View>
-          
+
           <View style={styles.detailRow}>
             <Ionicons name="location-outline" size={14} color="#666" />
             <Text style={styles.detailText} numberOfLines={1}>
@@ -85,7 +98,7 @@ export default function UserListScreen({ navigation }) {
           </View>
         </View>
       </View>
-      
+
       <Ionicons name="chevron-forward" size={20} color="#bbb" />
     </TouchableOpacity>
   );
@@ -100,12 +113,12 @@ export default function UserListScreen({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Danh sách người dùng</Text>
         <Text style={styles.subtitle}>{users.length} người dùng</Text>
       </View>
-      
+
       {users.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="people-outline" size={60} color="#ccc" />
@@ -120,13 +133,13 @@ export default function UserListScreen({ navigation }) {
           contentContainerStyle={styles.listContainer}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
+  container: {
+    flex: 1,
     backgroundColor: "#f4f6f8",
   },
   header: {
@@ -168,9 +181,9 @@ const styles = StyleSheet.create({
     position: "relative",
     marginRight: 15,
   },
-  avatar: { 
-    width: 56, 
-    height: 56, 
+  avatar: {
+    width: 56,
+    height: 56,
     borderRadius: 28,
   },
   defaultAvatar: {
@@ -196,12 +209,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#fff",
   },
-  info: { 
-    flex: 1, 
+  info: {
+    flex: 1,
     marginRight: 10,
   },
-  name: { 
-    fontSize: 16, 
+  name: {
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333",
     marginBottom: 5,
@@ -214,8 +227,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 2,
   },
-  detailText: { 
-    fontSize: 13, 
+  detailText: {
+    fontSize: 13,
     color: "#666",
     marginLeft: 5,
   },

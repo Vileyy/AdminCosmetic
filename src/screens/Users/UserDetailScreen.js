@@ -3,44 +3,43 @@ import {
   View,
   Text,
   Image,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
+  SafeAreaView,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
-import { getDatabase, ref, get, update, remove } from "firebase/database";
+import { getDatabase, ref, onValue, remove, update } from "firebase/database";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function UserDetailScreen({ route, navigation }) {
   const { userId } = route.params;
   const [user, setUser] = useState(null);
-  const [editing, setEditing] = useState(false);
-  const [updatedUser, setUpdatedUser] = useState({});
 
   useEffect(() => {
     const db = getDatabase();
-    get(ref(db, `users/${userId}`))
-      .then((snapshot) => {
+    const userRef = ref(db, `users/${userId}`);
+
+    // Subscribe to real-time updates
+    const unsubscribe = onValue(
+      userRef,
+      (snapshot) => {
         if (snapshot.exists()) {
           setUser(snapshot.val());
-          setUpdatedUser(snapshot.val());
         } else {
           Alert.alert("Lỗi", "Không tìm thấy user!");
           navigation.goBack();
         }
-      })
-      .catch((error) => Alert.alert("Lỗi", error.message));
-  }, [userId]);
+      },
+      (error) => {
+        Alert.alert("Lỗi", error.message);
+      }
+    );
 
-  const handleUpdateUser = () => {
-    const db = getDatabase();
-    update(ref(db, `users/${userId}`), updatedUser)
-      .then(() => {
-        Alert.alert("Thành công", "Cập nhật thông tin thành công!");
-        setEditing(false);
-        setUser(updatedUser);
-      })
-      .catch((error) => Alert.alert("Lỗi", error.message));
-  };
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [userId]);
 
   const handleDeleteUser = () => {
     Alert.alert("Xóa User", "Bạn có chắc muốn xóa người dùng này?", [
@@ -75,113 +74,241 @@ export default function UserDetailScreen({ route, navigation }) {
       .catch((error) => Alert.alert("Lỗi", error.message));
   };
 
-  if (!user) return <Text>Đang tải...</Text>;
+  if (!user) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4a90e2" />
+        <Text style={styles.loadingText}>Đang tải thông tin...</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: user.avatar }} style={styles.avatar} />
-      {editing ? (
-        <>
-          <TextInput
-            style={styles.input}
-            value={updatedUser.name}
-            onChangeText={(text) =>
-              setUpdatedUser({ ...updatedUser, name: text })
-            }
-          />
-          <TextInput
-            style={styles.input}
-            value={updatedUser.email}
-            onChangeText={(text) =>
-              setUpdatedUser({ ...updatedUser, email: text })
-            }
-          />
-          <TextInput
-            style={styles.input}
-            value={updatedUser.phone}
-            onChangeText={(text) =>
-              setUpdatedUser({ ...updatedUser, phone: text })
-            }
-          />
-          <TextInput
-            style={styles.input}
-            value={updatedUser.address}
-            onChangeText={(text) =>
-              setUpdatedUser({ ...updatedUser, address: text })
-            }
-          />
-          <TouchableOpacity style={styles.button} onPress={handleUpdateUser}>
-            <Text style={styles.buttonText}>Lưu</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.cancelButton]}
-            onPress={() => setEditing(false)}
-          >
-            <Text style={styles.buttonText}>Hủy</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Text style={styles.info}>Tên: {user.name}</Text>
-          <Text style={styles.info}>Email: {user.email}</Text>
-          <Text style={styles.info}>SĐT: {user.phone}</Text>
-          <Text style={styles.info}>Địa chỉ: {user.address}</Text>
-          <Text style={styles.info}>Trạng thái: {user.status}</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <View style={styles.avatarContainer}>
+            {user.photoURL && user.photoURL !== "" ? (
+              <Image
+                source={{ uri: user.photoURL }}
+                style={styles.avatar}
+                onError={(e) =>
+                  console.log("Avatar load error:", e.nativeEvent.error)
+                }
+              />
+            ) : (
+              <View style={styles.defaultAvatar}>
+                <Text style={styles.defaultAvatarText}>
+                  {user.displayName
+                    ? user.displayName.charAt(0).toUpperCase()
+                    : "U"}
+                </Text>
+              </View>
+            )}
+            <View
+              style={[
+                styles.statusIndicator,
+                {
+                  backgroundColor:
+                    user.status === "active" ? "#4CAF50" : "#F44336",
+                },
+              ]}
+            />
+          </View>
+          <Text style={styles.name}>{user.displayName || "Chưa cập nhật"}</Text>
+          <Text style={styles.email}>{user.email || "Chưa cập nhật"}</Text>
+        </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Thông tin cá nhân</Text>
+          <View style={styles.infoRow}>
+            <Ionicons name="person-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>
+              {user.displayName || "Chưa cập nhật"}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="mail-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>{user.email || "Chưa cập nhật"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="call-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>{user.phone || "Chưa cập nhật"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="location-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>
+              {user.address || "Chưa cập nhật"}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="transgender-outline" size={20} color="#666" />
+            <Text style={styles.infoText}>
+              {user.gender === "male"
+                ? "Nam"
+                : user.gender === "female"
+                ? "Nữ"
+                : user.gender === "other"
+                ? "Khác"
+                : user.gender
+                ? user.gender
+                : "Chưa cập nhật"}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => setEditing(true)}
+            style={styles.editButton}
+            onPress={() => navigation.navigate("UserEditScreen", { userId })}
           >
-            <Text style={styles.buttonText}>Chỉnh sửa</Text>
+            <Text style={styles.buttonText}>Chỉnh sửa thông tin</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.banButton]}
-            onPress={toggleBanUser}
-          >
+          <TouchableOpacity style={styles.banButton} onPress={toggleBanUser}>
             <Text style={styles.buttonText}>
-              {user.status === "banned" ? "Mở khóa" : "Cấm"}
+              {user.status === "banned"
+                ? "Mở khóa tài khoản"
+                : "Khóa tài khoản"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button, styles.deleteButton]}
+            style={styles.deleteButton}
             onPress={handleDeleteUser}
           >
-            <Text style={styles.buttonText}>Xóa</Text>
+            <Text style={styles.deleteButtonText}>Xóa tài khoản</Text>
           </TouchableOpacity>
-        </>
-      )}
-    </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f4f6f8",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f6f8",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "#666",
+  },
+  header: {
+    alignItems: "center",
     padding: 20,
     backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  avatarContainer: {
+    position: "relative",
+    marginBottom: 15,
+    marginTop: 30,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  defaultAvatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#e1e4e8",
+    justifyContent: "center",
     alignItems: "center",
   },
-  avatar: { width: 100, height: 100, borderRadius: 50, marginBottom: 10 },
-  input: {
-    width: "100%",
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
+  defaultAvatarText: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "#8c939d",
+  },
+  statusIndicator: {
+    position: "absolute",
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    bottom: 0,
+    right: 0,
+    borderWidth: 3,
+    borderColor: "#fff",
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 5,
+  },
+  email: {
+    fontSize: 16,
+    color: "#666",
+  },
+  section: {
+    backgroundColor: "#fff",
+    marginTop: 15,
+    padding: 20,
+    borderRadius: 12,
+    marginHorizontal: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 15,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  infoText: {
+    fontSize: 16,
+    color: "#333",
+    marginLeft: 10,
+  },
+  buttonContainer: {
+    padding: 15,
+    marginTop: 15,
+  },
+  editButton: {
+    backgroundColor: "#4a90e2",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
     marginBottom: 10,
-    paddingHorizontal: 10,
   },
-  info: { fontSize: 18, marginBottom: 5 },
-  button: {
-    backgroundColor: "#3498db",
-    padding: 10,
-    borderRadius: 5,
+  banButton: {
+    backgroundColor: "#f39c12",
+    padding: 15,
+    borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
-    width: "100%",
+    marginBottom: 10,
   },
-  buttonText: { color: "#fff", fontSize: 16 },
-  cancelButton: { backgroundColor: "#95a5a6" },
-  deleteButton: { backgroundColor: "#e74c3c" },
-  banButton: { backgroundColor: "#f39c12" },
+  deleteButton: {
+    backgroundColor: "#f4f6f8",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e74c3c",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  deleteButtonText: {
+    color: "#e74c3c",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

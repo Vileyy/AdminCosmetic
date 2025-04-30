@@ -63,9 +63,22 @@ export default function UserOrderHistoryScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
-  noOrders: { fontSize: 16, color: "gray", textAlign: "center", marginTop: 20 },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  noOrders: {
+    fontSize: 16,
+    color: "gray",
+    textAlign: "center",
+    marginTop: 20,
+  },
   orderCard: {
     flexDirection: "row",
     backgroundColor: "#f8f9fa",
@@ -73,9 +86,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-  productImage: { width: 50, height: 50, marginRight: 10, borderRadius: 5 },
-  productName: { fontSize: 16, fontWeight: "bold" },
-  orderDate: { fontSize: 14, color: "gray" },
-  orderStatus: { fontSize: 14, color: "#3498db" },
-  orderTotal: { fontSize: 14, fontWeight: "bold", color: "#e74c3c" },
+  productImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+    borderRadius: 5,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  orderDate: {
+    fontSize: 14,
+    color: "gray",
+  },
+  orderStatus: {
+    fontSize: 14,
+    color: "#3498db",
+  },
+  orderTotal: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#e74c3c",
+  },
 });

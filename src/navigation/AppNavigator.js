@@ -6,6 +6,7 @@ import AddProductScreen from "../screens/Products/AddProductScreen";
 import EditProductScreen from "../screens/Products/EditProductScreen";
 import UserListScreen from "../screens/Users/UserListScreen";
 import UserDetailScreen from "../screens/Users/UserDetailScreen";
+import UserEditScreen from "../screens/Users/UserEditScreen";
 import CategoryListScreen from "../screens/Categories/CategoryListScreen";
 import AddCategoryScreen from "../screens/Categories/AddCategoryScreen";
 import EditCategoryScreen from "../screens/Categories/EditCategoryScreen";
@@ -45,6 +46,7 @@ export default function AppNavigator() {
       {/* Quản lý người dùng */}
       <Stack.Screen name="UserListScreen" component={UserListScreen} />
       <Stack.Screen name="UserDetailScreen" component={UserDetailScreen} />
+      <Stack.Screen name="UserEditScreen" component={UserEditScreen} />
 
       {/* Quản lý Danh mục */}
       <Stack.Screen name="CategoryListScreen" component={CategoryListScreen} />
