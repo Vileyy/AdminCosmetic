@@ -19,6 +19,8 @@ import RevenueScreen from "../screens/Revenue/RevenueScreen";
 import BannerListScreen from "../screens/Banner/BannerListScreen";
 import AddBannerScreen from "../screens/Banner/AddBannerScreen";
 import EditBannerScreen from "../screens/Banner/EditBannerScreen";
+import NotificationListScreen from "../screens/Notifications/NotificationListScreen";
+import AddNotificationScreen from "../screens/Notifications/AddNotificationScreen";
 
 const Stack = createStackNavigator();
 
@@ -70,6 +72,15 @@ export default function AppNavigator() {
       <Stack.Screen name="AddBannerScreen" component={AddBannerScreen} />
       <Stack.Screen name="EditBannerScreen" component={EditBannerScreen} />
 
+      {/* Quản lý Thông báo */}
+      <Stack.Screen
+        name="NotificationListScreen"
+        component={NotificationListScreen}
+      />
+      <Stack.Screen
+        name="AddNotificationScreen"
+        component={AddNotificationScreen}
+      />
     </Stack.Navigator>
   );
 }

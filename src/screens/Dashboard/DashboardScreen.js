@@ -106,6 +106,20 @@ export default function DashboardScreen({ navigation }) {
             <Text style={styles.cardText}>Quản lý banner</Text>
           </LinearGradient>
         </TouchableOpacity>
+
+        {/* Quản lý thông báo */}
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("NotificationListScreen")}
+        >
+          <LinearGradient
+            colors={["#9b59b6", "#8e44ad"]}
+            style={styles.cardInner}
+          >
+            <MaterialIcons name="notifications" size={50} color="#fff" />
+            <Text style={styles.cardText}>Quản lý thông báo</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </View>
   );
